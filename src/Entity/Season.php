@@ -27,9 +27,13 @@ class Season
     #[ORM\ManyToMany(targetEntity: Ingredient::class, mappedBy: 'seasons')]
     private Collection $ingredients;
 
+    #[ORM\ManyToMany(targetEntity: Recipe::class, mappedBy: 'seasons')]
+    private Collection $recipes;
+
     public function __construct()
     {
         $this->ingredients = new ArrayCollection();
+        $this->recipes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -95,6 +99,33 @@ class Season
     {
         if ($this->ingredients->removeElement($ingredient)) {
             $ingredient->removeSeason($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Recipe>
+     */
+    public function getRecipes(): Collection
+    {
+        return $this->recipes;
+    }
+
+    public function addRecipe(Recipe $recipe): self
+    {
+        if (!$this->recipes->contains($recipe)) {
+            $this->recipes->add($recipe);
+            $recipe->addSeason($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRecipe(Recipe $recipe): self
+    {
+        if ($this->recipes->removeElement($recipe)) {
+            $recipe->removeSeason($this);
         }
 
         return $this;
